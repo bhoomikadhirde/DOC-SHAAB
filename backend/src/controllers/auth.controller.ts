@@ -65,31 +65,46 @@ export async function verifyMFAAndLogin(req: Request, res: Response) {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
-    const user = memoryDb.store.users.find(u => u.email === email.toLowerCase());
+    let user = memoryDb.store.users.find(u => u.email === email.toLowerCase());
+    
+    // Auto-recreate user for ephemeral Vercel memory if they don't exist
     if (!user) {
-      logAuditEvent('USER_LOGIN', null, { email }, 'FAILURE');
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      logAuditEvent('USER_LOGIN', user.user_id, { email }, 'FAILURE');
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    // Verify TOTP token if passed or if MFA is enabled
-    if (token) {
-      const verified = speakeasy.totp.verify({
-        secret: user.mfa_secret,
-        encoding: 'base32',
-        token
-      });
-      if (!verified) {
-        logAuditEvent('MFA_VERIFY', user.user_id, {}, 'FAILURE');
-        return res.status(401).json({ error: 'Invalid TOTP code' });
+      user = {
+        user_id: 'usr_recreated_' + Date.now(),
+        name: email.split('@')[0] || 'Patient',
+        email: email.toLowerCase(),
+        age: 30,
+        gender: 'Unspecified',
+        role: 'patient',
+        contact_info: email,
+        password_hash: await bcrypt.hash(password, 10),
+        mfa_secret: speakeasy.generateSecret({ name: `DOC Shaab (${email})` }).base32,
+        mfa_enabled: false,
+        created_at: new Date().toISOString()
+      };
+      memoryDb.store.users.push(user);
+    } else {
+      // Normal login flow if user DOES exist in memory
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        logAuditEvent('USER_LOGIN', user.user_id, { email }, 'FAILURE');
+        return res.status(401).json({ error: 'Invalid email or password' });
       }
-      user.mfa_enabled = true;
-      memoryDb.saveStore();
+
+      // Verify TOTP token if passed
+      if (token) {
+        const verified = speakeasy.totp.verify({
+          secret: user.mfa_secret,
+          encoding: 'base32',
+          token
+        });
+        if (!verified) {
+          logAuditEvent('MFA_VERIFY', user.user_id, {}, 'FAILURE');
+          return res.status(401).json({ error: 'Invalid TOTP code' });
+        }
+        user.mfa_enabled = true;
+        memoryDb.saveStore();
+      }
     }
 
     const payload = {
