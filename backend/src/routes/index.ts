@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { registerUser, verifyMFAAndLogin, getCurrentUser, logoutUser, updateUser, deleteUser } from '../controllers/auth.controller';
 import { upsertMedicalHistory, getMedicalHistory, getVitalsAndDashboard } from '../controllers/patient.controller';
-import { processReportUpload, uploadMiddleware, getUserReports, deleteReport } from '../controllers/report.controller';
+import { processReportUpload, uploadMiddleware, getUserReports, deleteReport, getReportById } from '../controllers/report.controller';
 import { chatConsultation, generatePreConsultationSummary } from '../controllers/ai.controller';
 import { getNearbyFacilities } from '../controllers/facility.controller';
 import { requireAuth } from '../middleware/auth.middleware';
@@ -24,6 +24,7 @@ router.get('/patient/dashboard', requireAuth, getVitalsAndDashboard);
 // Report Upload & OCR Routes
 router.post('/reports/upload', requireAuth, uploadMiddleware, processReportUpload);
 router.get('/reports', requireAuth, getUserReports);
+router.get('/reports/:id', requireAuth, getReportById);
 router.delete('/reports/:id', requireAuth, deleteReport);
 
 // AI Pre-Consultation Engine Routes

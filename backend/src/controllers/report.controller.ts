@@ -158,3 +158,20 @@ export async function deleteReport(req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ error: 'Failed to delete report' });
   }
 }
+
+export async function getReportById(req: AuthenticatedRequest, res: Response) {
+  try {
+    const userId = req.user?.user_id;
+    const reportId = req.params.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const report = memoryDb.store.reports.find(r => r.report_id === reportId && r.user_id === userId);
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    return res.json({ report });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch report' });
+  }
+}
