@@ -153,13 +153,13 @@ export function App() {
               <VitalsPanel vitals={vitals} />
 
               {/* Recent Records Table */}
-              <RecentRecordsTable records={records} />
+              <RecentRecordsTable records={records} onRefresh={loadDashboardData} />
             </>
           )}
 
           {activeTab === 'history' && (
             <div className="space-y-6">
-              <RecentRecordsTable records={records} />
+              <RecentRecordsTable records={records} onRefresh={loadDashboardData} />
             </div>
           )}
 

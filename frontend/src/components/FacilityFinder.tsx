@@ -5,8 +5,22 @@ import axios from 'axios';
 export const FacilityFinder: React.FC = () => {
   const [facilities, setFacilities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
+    // 1. Fetch user location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+        },
+        (error) => {
+          console.warn('Geolocation denied or failed', error);
+        }
+      );
+    }
+
+    // 2. Fetch facilities
     const fetchFacilities = async () => {
       try {
         const res = await axios.get('/api/v1/facilities');
@@ -20,17 +34,23 @@ export const FacilityFinder: React.FC = () => {
     fetchFacilities();
   }, []);
 
+  const mapQuery = userLocation 
+    ? `${userLocation.lat},${userLocation.lng}` 
+    : 'hospitals+near+me';
+
   return (
     <div className="space-y-6">
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex items-center justify-between">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-clinical-navy flex items-center gap-2">
             <MapPin className="w-5 h-5 text-clinical-teal" />
             <span>Nearby Hospitals & Medical Facilities</span>
           </h2>
-          <p className="text-xs text-slate-500">Google Maps Places API location-based healthcare finder</p>
+          <p className="text-xs text-slate-500">
+            {userLocation ? 'Displaying facilities near your exact location' : 'Google Maps Places API location-based healthcare finder'}
+          </p>
         </div>
-        <span className="text-xs bg-teal-50 text-clinical-teal font-bold px-3 py-1 rounded border border-teal-200">
+        <span className="text-xs bg-teal-50 text-clinical-teal font-bold px-3 py-1 rounded border border-teal-200 text-center">
           Emergency Services 24/7
         </span>
       </div>
@@ -90,11 +110,13 @@ export const FacilityFinder: React.FC = () => {
 
         {/* Map View Widget */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-700 rounded-xl min-h-[400px] flex flex-col items-center justify-center p-6 text-center text-white relative overflow-hidden shadow-inner">
+          {/* We use key={mapQuery} to force iframe to re-render when location is found */}
           <iframe
+            key={mapQuery}
             title="Google Maps Medical Facilities"
             className="absolute inset-0 w-full h-full border-0 opacity-80"
             loading="lazy"
-            src="https://maps.google.com/maps?q=hospitals+near+me&t=&z=13&ie=UTF8&iwloc=&output=embed"
+            src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
           ></iframe>
         </div>
       </div>

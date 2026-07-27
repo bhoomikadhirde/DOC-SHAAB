@@ -71,12 +71,23 @@ export async function processReportUpload(req: AuthenticatedRequest, res: Respon
     }
 
     const reportId = 'rep_' + Date.now();
+    
+    // Convert file to Base64 for persistent storage in memoryDb (since Vercel deletes /tmp)
+    let fileData = '';
+    try {
+      fileData = fs.readFileSync(filePath).toString('base64');
+    } catch (e) {
+      console.error('Failed to encode file to Base64', e);
+    }
+
     const newReport = {
       report_id: reportId,
       user_id: userId,
       file_path: filePath,
       saved_filename: req.file.filename,
       filename: req.file.originalname,
+      mime_type: req.file.mimetype,
+      file_data: fileData,
       report_type: reportType,
       extracted_text: extractedText,
       date_uploaded: new Date().toISOString()

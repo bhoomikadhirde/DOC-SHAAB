@@ -54,7 +54,42 @@ export const ViewRecordModal: React.FC<ViewRecordModalProps> = ({ record, onClos
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+          <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4">
+            
+            {/* Original Document Viewer */}
+            {record.file_data ? (
+              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col items-center">
+                <div className="w-full bg-slate-100 border-b border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 flex justify-between">
+                  <span>Original Document Preview</span>
+                  <a 
+                    href={`data:${record.mime_type || 'application/pdf'};base64,${record.file_data}`} 
+                    download={record.filename}
+                    className="text-clinical-teal hover:underline"
+                  >
+                    Download
+                  </a>
+                </div>
+                {record.mime_type?.startsWith('image/') ? (
+                  <img 
+                    src={`data:${record.mime_type};base64,${record.file_data}`} 
+                    alt="Medical Report" 
+                    className="max-w-full max-h-[60vh] object-contain"
+                  />
+                ) : (
+                  <iframe 
+                    src={`data:${record.mime_type || 'application/pdf'};base64,${record.file_data}`} 
+                    className="w-full h-[60vh] border-none"
+                    title="Document Viewer"
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm">
+                <p className="text-slate-500 text-sm">Original document file is not available.</p>
+              </div>
+            )}
+
+            {/* OCR Extraction Results */}
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-xs font-bold uppercase tracking-wider text-clinical-navy mb-4 border-b border-slate-100 pb-2">
                 Tesseract OCR Extraction Results

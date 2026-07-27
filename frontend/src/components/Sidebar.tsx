@@ -1,5 +1,6 @@
 import React from 'react';
-import { Home, FileText, Bot, MapPin, Settings, LogOut, Stethoscope } from 'lucide-react';
+import { Home, FileText, Bot, MapPin, Settings, LogOut, Stethoscope, Trash2 } from 'lucide-react';
+import axios from 'axios';
 
 interface SidebarProps {
   activeTab: string;
@@ -15,6 +16,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
     { id: 'facilities', label: 'Doctor Connect & Maps', icon: MapPin },
     { id: 'settings', label: 'System Settings', icon: Settings }
   ];
+
+  const handleDeleteAccount = async () => {
+    if (confirm('Are you absolutely sure you want to permanently delete your account and all associated medical data? This action cannot be undone.')) {
+      try {
+        await axios.delete('/api/v1/auth/me');
+        onLogout();
+      } catch (err) {
+        alert('Failed to delete account.');
+      }
+    }
+  };
 
   return (
     <aside className="w-64 bg-clinical-navy text-white flex flex-col h-screen sticky top-0 border-r border-clinical-darkBorder shrink-0">
@@ -49,13 +61,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
         })}
       </nav>
 
-      <div className="p-4 border-t border-clinical-darkBorder">
+      <div className="p-4 border-t border-clinical-darkBorder space-y-2">
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 transition-all"
         >
           <LogOut className="w-4 h-4" />
           <span>Lock / Log Out</span>
+        </button>
+        <button
+          onClick={handleDeleteAccount}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 transition-all"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>Delete Account</span>
         </button>
       </div>
     </aside>
