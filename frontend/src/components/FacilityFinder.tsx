@@ -8,22 +8,11 @@ export const FacilityFinder: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
-    // 1. Fetch user location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
-        },
-        (error) => {
-          console.warn('Geolocation denied or failed', error);
-        }
-      );
-    }
-
-    // 2. Fetch facilities
-    const fetchFacilities = async () => {
+    const fetchFacilities = async (lat?: number, lng?: number) => {
       try {
-        const res = await axios.get('/api/v1/facilities');
+        let url = '/api/v1/facilities';
+        if (lat && lng) url += `?lat=${lat}&lng=${lng}`;
+        const res = await axios.get(url);
         setFacilities(res.data.facilities);
       } catch (err) {
         console.error('Failed to fetch facilities', err);
@@ -31,12 +20,26 @@ export const FacilityFinder: React.FC = () => {
         setLoading(false);
       }
     };
-    fetchFacilities();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+          fetchFacilities(position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          console.warn('Geolocation denied or failed', error);
+          fetchFacilities(); // fallback
+        }
+      );
+    } else {
+      fetchFacilities(); // fallback
+    }
   }, []);
 
-  const mapQuery = userLocation 
-    ? `${userLocation.lat},${userLocation.lng}` 
-    : 'hospitals+near+me';
+  const mapQuery = userLocation ? 'hospitals' : 'hospitals+near+me';
+  const llParam = userLocation ? `&ll=${userLocation.lat},${userLocation.lng}` : '';
+  const mapSrc = `https://maps.google.com/maps?q=${mapQuery}${llParam}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="space-y-6">
@@ -110,13 +113,12 @@ export const FacilityFinder: React.FC = () => {
 
         {/* Map View Widget */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-700 rounded-xl min-h-[400px] flex flex-col items-center justify-center p-6 text-center text-white relative overflow-hidden shadow-inner">
-          {/* We use key={mapQuery} to force iframe to re-render when location is found */}
           <iframe
-            key={mapQuery}
+            key={mapSrc}
             title="Google Maps Medical Facilities"
             className="absolute inset-0 w-full h-full border-0 opacity-80"
             loading="lazy"
-            src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+            src={mapSrc}
           ></iframe>
         </div>
       </div>
