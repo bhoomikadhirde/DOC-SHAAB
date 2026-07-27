@@ -20,7 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
   const handleDeleteAccount = async () => {
     if (confirm('Are you absolutely sure you want to permanently delete your account and all associated medical data? This action cannot be undone.')) {
       try {
-        await axios.delete('/api/v1/auth/me');
+        await axios.delete('/api/v1/auth/user');
         onLogout();
       } catch (err) {
         alert('Failed to delete account.');

@@ -23,7 +23,7 @@ export const RecentRecordsTable: React.FC<RecentRecordsTableProps> = ({ records,
 
     setUploading(true);
     try {
-      await axios.post('/api/v1/reports', formData, {
+      await axios.post('/api/v1/reports/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (onRefresh) onRefresh();
