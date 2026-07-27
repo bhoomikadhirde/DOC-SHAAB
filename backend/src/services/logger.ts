@@ -3,6 +3,19 @@ import path from 'path';
 
 const logDirectory = path.join(__dirname, '../../logs');
 
+const transports: any[] = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple()
+    )
+  })
+];
+
+if (!process.env.VERCEL) {
+  transports.push(new winston.transports.File({ filename: path.join(logDirectory, 'audit.log') }));
+}
+
 export const auditLogger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
@@ -10,15 +23,7 @@ export const auditLogger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { service: 'doc-shaab-audit' },
-  transports: [
-    new winston.transports.File({ filename: path.join(logDirectory, 'audit.log') }),
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
-  ]
+  transports
 });
 
 export function logAuditEvent(action: string, userId: string | null, details: any, result: 'SUCCESS' | 'FAILURE') {

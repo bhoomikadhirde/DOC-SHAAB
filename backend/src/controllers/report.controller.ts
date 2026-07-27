@@ -7,9 +7,13 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { memoryDb } from '../db';
 import { logAuditEvent } from '../services/logger';
 
-const uploadsDir = path.join(__dirname, '../../uploads');
+const uploadsDir = process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, '../../uploads');
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch (e) {
+    console.warn('Vercel EROFS warning skipped for uploads dir');
+  }
 }
 
 const storage = multer.diskStorage({
