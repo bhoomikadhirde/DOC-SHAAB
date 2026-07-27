@@ -30,9 +30,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString(), app: 'DOC Shaab' });
 });
 
-app.listen(config.port, () => {
-  console.log(`=================================================`);
-  console.log(`DOC Shaab Backend API running on port ${config.port}`);
-  console.log(`Environment: ${config.nodeEnv}`);
-  console.log(`=================================================`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`=================================================`);
+    console.log(`DOC Shaab Backend API running on port ${config.port}`);
+    console.log(`Environment: ${config.nodeEnv}`);
+    console.log(`=================================================`);
+  });
+}
+
+export default app;
