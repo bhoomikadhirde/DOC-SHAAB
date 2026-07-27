@@ -23,6 +23,10 @@
       "destination": "/frontend/assets/$1"
     },
     {
+      "source": "/frames/(.*)",
+      "destination": "/frontend/frames/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/index.html"
     }
