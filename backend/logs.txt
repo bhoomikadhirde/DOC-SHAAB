@@ -1,0 +1,27 @@
+
+> doc-shaab-backend@1.0.0 dev
+> ts-node-dev --respawn --transpile-only src/index.ts
+
+[INFO] 23:57:29 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+=================================================
+DOC Shaab Backend API running on port 5000
+Environment: development
+=================================================
+[32minfo[39m: [object Object] {"service":"doc-shaab-audit","timestamp":"2026-07-26T18:29:45.281Z"}
+[32minfo[39m: [object Object] {"service":"doc-shaab-audit","timestamp":"2026-07-26T18:29:45.285Z"}
+[32minfo[39m: [object Object] {"service":"doc-shaab-audit","timestamp":"2026-07-26T18:29:45.351Z"}
+[32minfo[39m: [object Object] {"service":"doc-shaab-audit","timestamp":"2026-07-26T18:29:45.352Z"}
+Error in pixReadStream: Unknown format: no pix returned
+Error: Error: Error attempting to read image.
+    at Worker.<anonymous> (C:\Users\BHOOMIKA\.gemini\antigravity\scratch\doc-shaab\backend\node_modules\tesseract.js\src\createWorker.js:247:15)
+    at Worker.emit (node:events:509:28)
+    at MessagePort.<anonymous> (node:internal/worker:332:53)
+    at MessagePort.[nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)
+OCR processing warning, using filename extract: undefined
+[ERROR] 23:59:45 Error: Error: Error attempting to read image.
+[INFO] 00:02:15 Restarting: C:\Users\BHOOMIKA\.gemini\antigravity\scratch\doc-shaab\backend\src\controllers\report.controller.ts has been modified
+=================================================
+DOC Shaab Backend API running on port 5000
+Environment: development
+=================================================
