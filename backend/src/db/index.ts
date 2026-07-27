@@ -22,7 +22,22 @@ interface MemoryStore {
 }
 
 let store: MemoryStore = {
-  users: [],
+  users: [
+    {
+      user_id: 'usr_demo',
+      name: 'Bhoomika Dhirde',
+      email: 'bhoomikadhirde@gmail.com',
+      age: 21,
+      gender: 'Female',
+      role: 'patient',
+      contact_info: 'bhoomikadhirde@gmail.com',
+      // Hash for 'password' (bcrypt 10 rounds)
+      password_hash: '$2a$10$KSwfkEv62PUMEwz3c5UJ8.YLK9LR1nd/Mu1jjFkgzwz9Jy9iIJQDa',
+      mfa_secret: 'KVKVEVDFJ5JFI22V',
+      mfa_enabled: false,
+      created_at: new Date().toISOString()
+    }
+  ],
   medicalHistories: [],
   reports: [],
   symptomLogs: [],
