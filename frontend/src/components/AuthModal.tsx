@@ -34,7 +34,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
       setMfaSecret(res.data.mfaSecret);
       setStep('MFA');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      const errData = err.response?.data?.error;
+      setError(typeof errData === 'object' ? errData.message : (errData || 'Registration failed'));
     } finally {
       setLoading(false);
     }
@@ -52,7 +53,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
       });
       onSuccess(res.data.user);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Authentication failed');
+      const errData = err.response?.data?.error;
+      setError(typeof errData === 'object' ? errData.message : (errData || 'Authentication failed'));
     } finally {
       setLoading(false);
     }
