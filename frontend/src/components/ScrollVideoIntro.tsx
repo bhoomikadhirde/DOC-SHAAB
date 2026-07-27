@@ -126,6 +126,12 @@ export const ScrollVideoIntro: React.FC<ScrollVideoIntroProps> = ({ onFinishIntr
             <div className="text-sm text-clinical-teal font-mono">
               {Math.round((imagesLoaded / TOTAL_FRAMES) * 100)}%
             </div>
+            <button 
+              onClick={onFinishIntro}
+              className="mt-6 px-6 py-2 bg-clinical-slate border border-clinical-teal/50 text-clinical-teal text-sm rounded-lg hover:bg-clinical-teal hover:text-white transition-all shadow-lg"
+            >
+              Skip Intro
+            </button>
           </div>
         )}
 
